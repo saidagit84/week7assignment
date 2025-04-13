@@ -6,6 +6,11 @@ DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS category;
 
 -- Create tables
+CREATE TABLE category (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(128) NOT NULL
+);
+
 CREATE TABLE project (
     project_id INT AUTO_INCREMENT PRIMARY KEY,
     project_name VARCHAR(128) NOT NULL,
@@ -30,11 +35,6 @@ CREATE TABLE step (
     step_text TEXT NOT NULL,
     step_order INT NOT NULL,
     FOREIGN KEY (project_id) REFERENCES project(project_id) ON DELETE CASCADE
-);
-
-CREATE TABLE category (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(128) NOT NULL
 );
 
 CREATE TABLE project_category (

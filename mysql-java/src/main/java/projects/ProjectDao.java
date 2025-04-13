@@ -1,0 +1,52 @@
+package projects;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import projects.dao.DbConnection;
+import projects.entity.Project;
+import projects.exception.DbException;
+import provided.util.DaoBase;
+
+@SuppressWarnings("unused")
+public class ProjectDao extends DaoBase {
+	private static final String CATEGORY_TABLE = "category";
+	private static final String MATERIAL_TABLE = "material";
+	private static final String PROJECT_TABLE = "project";
+	private static final String PROJECT_CATEGORY_TABLE = "project_category";
+	private static final String STEP_TABLE = "step";
+
+	public Project insertProject(Project project) {
+		// TODO Auto-generated method stub
+		//@formatter:off
+		 String sql = ""
+				 + "INSERT INTO " + PROJECT_TABLE + ""
+				 + "(project_name, estimated_hours, actual_hours, difficulty, notes)"
+				 + "VALUES "
+				 + "(?, ?, ?, ?, ?)";
+		    //@formatter:on
+		    try (Connection conn = DbConnection.getConnection()) {
+		        startTransaction(conn);
+		        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		            setParameter(pstmt, 1, project.getProjectName(),String.class);
+		            setParameter(pstmt, 2, project.getEstimatedHours(),BigDecimal.class);
+		            setParameter(pstmt, 3, project.getActualHours(),BigDecimal.class);
+		            setParameter(pstmt, 4, project.getDifficulty(),Integer.class);
+		            setParameter(pstmt, 5, project.getNotes(),String.class);
+		            
+		            pstmt.executeUpdate();
+		            Integer projectId = getLastInsertId(conn, PROJECT_TABLE);
+		            project.setProjectId(projectId);
+		            commitTransaction(conn);
+		            return project;
+		        } catch (Exception e) {
+		            rollbackTransaction(conn);
+		            throw new DbException(e);
+		        }
+		    } catch (SQLException e) {
+		        throw new DbException(e);
+		    }
+	}
+
+}
