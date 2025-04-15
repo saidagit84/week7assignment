@@ -2,6 +2,7 @@ package projects;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import projects.entity.Project;
@@ -10,10 +11,13 @@ import projects.exception.DbException;
 import java.util.Objects;
 
 public class ProjectsApp {
+	private Project curProject;
 	private ProjectService projectService = new ProjectService();
 	 // @formatter:off
     private List<String> operations = List.of(
-        "1) Add a project"
+        "1) Add a project",
+    	"2) List projects",
+    	"3) Select a project"
     ); // @formatter:on
     
     private Scanner scanner = new Scanner(System.in);
@@ -39,16 +43,54 @@ public class ProjectsApp {
 	                 case 1:
 	                	    createProject();
 	                	    break;
+	                 case 2: 
+	                     listProjects(); 
+	                     break;
+	                 case 3: 
+	                	    selectProject();
+	                	    break;
 	                     case -1:
 	                         done = exitMenu();
 	                         break;
 	                     default:
 	                         System.out.println("\n" + selection + " is not a valid selection. Try again.");
 	                 }
-	             } catch (Exception e) {
+	             }
+	        	 catch (Exception e) {
 	                 System.out.println("Error: " + e.toString());
 	             }
 	        }
+	}
+
+	private void selectProject() {
+		// TODO Auto-generated method stub
+		 curProject = null;
+		 listProjects();
+		    Integer projectId = getIntInput("Enter a project ID to select a project");
+		   
+
+		    try {
+		        curProject = projectService.fetchProjectById(projectId); 
+		        if (curProject != null) {
+		            System.out.println("Selected Project: " + curProject);
+		           
+		        }
+		    }
+		    catch (NoSuchElementException e) {
+		        System.out.println("Invalid project ID selected.");
+		    }
+	}
+
+	private void listProjects() {
+		// TODO Auto-generated method stub
+		List<Project> projects = projectService.fetchAllProjects(); 
+	   
+	    System.out.println("\nProjects:");
+
+	    
+	    projects.forEach(project -> System.out.println("  " + project.getProjectId() + ": " + project.getProjectName())); 
+	    
+		
 	}
 
 	private void createProject() {
@@ -120,6 +162,10 @@ public class ProjectsApp {
 		// TODO Auto-generated method stub
 		 System.out.println("\nThese are the available selections. Press Enter key to quit:");
 	        operations.forEach(line -> System.out.println("  " + line));
-		
+	        if (curProject == null) {
+	            System.out.println("\nYou are not working with a project.");
+	        } else {
+	            System.out.println("\nYou are working with project: " + curProject.getProjectName());
+	        }
 	}
 }
